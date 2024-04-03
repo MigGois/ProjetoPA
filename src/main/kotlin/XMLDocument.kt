@@ -54,6 +54,14 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
     }
 
+    fun renameAttribute(key: String, newkey: String) {
+        if (attributes.containsKey(key)) {
+            attributes[newkey] = attributes.remove(key)!!
+        } else {
+            println("Atributo '$key' não existe.")
+        }
+    }
+
     //Remover atributos
     fun removeAttribute(key: String) {
         if (attributes.containsKey(key)) {
@@ -123,9 +131,21 @@ class XMLDocument {
         return sb.toString()
     }
 
+    fun accept(visitor: (XMLElement) -> Boolean){
+        element!!.accept(visitor)
+    }
+
+    fun renameXMLElements(oldname: String, newname: String) {
+        this.accept { if (it.name == oldname) it.name = newname; true }
+    }
+
+    fun renameAttributes(elementname:String, oldname: String, newname: String){
+        this.accept { if(it.name == elementname) it.renameAttribute(oldname, newname); true}
+    }
+
 }
 
-interface visitor{
+interface Visitor{
     fun visit(xml: XMLElement):Boolean
 }
 
@@ -170,6 +190,9 @@ fun createExampleXML(): String {
     val componente5 = XMLElement("componente", parent = avaliacao2)
     componente5.addAttribute("nome", "Discussão")
     componente5.addAttribute("peso", "20%")
+
+    document.renameXMLElements("componente", "bacano")
+    document.renameAttributes("bacano","nome", "apelido")
 
     return document.generateXML().trimIndent()
 }
