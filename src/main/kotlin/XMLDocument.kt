@@ -1,5 +1,7 @@
 package main.kotlin
 
+import java.io.File
+
 internal const val red = "\u001b[31m"
 internal const val green = "\u001b[32m"
 internal const val brightred = "\u001b[38;5;210m"
@@ -18,8 +20,12 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     }
 
     // Obter entidades child
-    fun getElements(): List<XMLElement> {
+    fun getChildrens(): List<XMLElement> {
         return children
+    }
+
+    fun getParents(): XMLElement? {
+        return parent
     }
 
     fun addElement(element: XMLElement){
@@ -104,6 +110,31 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         return sb.toString()
     }
 
+    fun textToFile(): String{
+
+            var indent = "\t".repeat(depth)
+            val sb = StringBuilder()
+            sb.append("$indent<$name")
+            for ((key, value) in attributes) {
+                sb.append(" $key=\"$value\"")
+            }
+            if (children.isEmpty() && text == null) {
+                sb.append("/>\n")
+            } else {
+                if (text != null) {
+                    sb.append(">$text")
+                    indent = "\t".repeat(0)
+                } else {
+                    sb.append(">\n")
+                }
+                for (child in children) {
+                    sb.append(child.textToFile())
+                }
+                sb.append("$indent</$name>\n")
+            }
+        return sb.toString()
+    }
+
     fun accept(visitor: (XMLElement) -> Boolean){
         if(visitor(this)){
             children.forEach {
@@ -121,14 +152,33 @@ class XMLDocument {
         this.element = element
     }
 
-    fun generateXML(): String {
+    fun generateXMLConsole(): String {
 
         val sb = StringBuilder()
-
         sb.append("$brightred<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         sb.append(element?.toText())
 
         return sb.toString()
+    }
+
+    fun generateXMLFile(name: String){
+
+        try {
+            val file = File(name)
+            val sb = StringBuilder()
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            sb.append(element?.textToFile())
+
+                if(file.isFile){
+                    println("O ficheiro com '$name' já existe")
+                }else{
+                    println("O ficheiro '$name' foi criado")
+                }
+
+                file.writeText(sb.toString())
+        }catch(e: Exception) {
+            println("Ocorreu um problema na criação do ficheiro")
+        }
     }
 
     fun accept(visitor: (XMLElement) -> Boolean){
@@ -149,7 +199,7 @@ interface Visitor{
     fun visit(xml: XMLElement):Boolean
 }
 
-fun createExampleXML(): String {
+fun createExampleXML(){
     val document = XMLDocument()
 
     val plano = XMLElement("plano")
@@ -194,7 +244,10 @@ fun createExampleXML(): String {
     document.renameXMLElements("componente", "bacano")
     document.renameAttributes("bacano","nome", "apelido")
 
-    return document.generateXML().trimIndent()
+    println(document.generateXMLConsole().trimIndent())
+    document.generateXMLFile("teste.xml")
+    println("Childrens:" + avaliacao2.getChildrens())
+
 }
 
 fun main() {
