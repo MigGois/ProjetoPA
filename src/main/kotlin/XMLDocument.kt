@@ -20,21 +20,21 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     }
 
     // Obter entidades child
-    fun getChildrens(): List<XMLElement> {
-        return children
+    fun getChildrens(): List<String> {
+        return children.map { it.name }
     }
 
     fun getParents(): XMLElement? {
         return parent
     }
 
-    fun addElement(element: XMLElement){
+    fun addChild(element: XMLElement){
         element.parent?.children?.remove(element)
         children.add(element)
         element.parent = this
     }
 
-    fun removeElement(name: String, attributes: Map<String, String>) {
+    fun removeChild(name: String, attributes: Map<String, String>) {
         val iterator = children.iterator()
         while (iterator.hasNext()) {
             val element = iterator.next()
@@ -191,6 +191,12 @@ class XMLDocument {
 
     fun renameAttributes(elementname:String, oldname: String, newname: String){
         this.accept { if(it.name == elementname) it.renameAttribute(oldname, newname); true}
+    }
+
+    fun xPath(name: String): List<XMLElement>{
+        val list = mutableListOf<XMLElement>()
+        this.accept { if(it.name == name) list.add(it); true }
+        return list
     }
 
 }
