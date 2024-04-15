@@ -7,6 +7,16 @@ internal const val green = "\u001b[32m"
 internal const val brightred = "\u001b[38;5;210m"
 internal const val reset = "\u001b[0m"
 
+
+/**
+* Represents an XML element with a name, optional text content, and optional parent element.
+*
+* @property name The name of the XML element.
+* @property text The text content of the XML element, if any.
+* @property parent The parent XML element, if any.
+* @constructor Creates an XML element with name, text and parent.
+*/
+
 class XMLElement(var name: String, var text: String? = null, var parent: XMLElement? = null) {
     private val children = mutableListOf<XMLElement>()
     private val attributes = mutableMapOf<String, String>()
@@ -15,25 +25,44 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         parent?.children?.add(this)
     }
 
+    /**
+     * Returns the parent XML element.
+     */
     fun getElementName(): String{
         return name
     }
 
-    // Obter entidades child
+    /**
+     * Returns a list of names of child elements from the element.
+     */
     fun getChildrens(): List<String> {
         return children.map { it.name }
     }
 
+    /**
+     * Returns the parent XML element.
+     */
     fun getParents(): XMLElement? {
         return parent
     }
 
+    /**
+     * Adds a child XML element.
+     *
+     * @param element The child XML element to add.
+     */
     fun addChild(element: XMLElement){
         element.parent?.children?.remove(element)
         children.add(element)
         element.parent = this
     }
 
+    /**
+     * Removes a child XML element by its name and attributes.
+     *
+     * @param name The name of the child element to remove.
+     * @param attributes The attributes of the child element to match for removal.
+     */
     fun removeChild(name: String, attributes: Map<String, String>) {
         val iterator = children.iterator()
         while (iterator.hasNext()) {
@@ -45,13 +74,22 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
     }
 
-
-    //Adicionar atributos numa categoria
+    /**
+     * Adds an attribute to the XML element.
+     *
+     * @param key The key of the attribute.
+     * @param value The value of the attribute.
+     */
     fun addAttribute(key: String, value: String) {
         attributes[key] = value
     }
 
-    //Alterar atributos
+    /**
+     * Updates an attribute with the specified key to the given value.
+     *
+     * @param key The key of the attribute to update.
+     * @param value The new value for the attribute.
+     */
     fun updateAttribute(key: String, value: String) {
         if (attributes.containsKey(key)) {
             attributes[key] = value
@@ -60,6 +98,12 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
     }
 
+    /**
+     * Renames an attribute from the old key to the new key.
+     *
+     * @param key The current key of the attribute to rename.
+     * @param newkey The new key for the attribute.
+     */
     fun renameAttribute(key: String, newkey: String) {
         if (attributes.containsKey(key)) {
             attributes[newkey] = attributes.remove(key)!!
@@ -68,7 +112,11 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
     }
 
-    //Remover atributos
+    /**
+     * Removes an attribute with the specified key.
+     *
+     * @param key The key of the attribute to remove.
+     */
     fun removeAttribute(key: String) {
         if (attributes.containsKey(key)) {
             attributes.remove(key)
@@ -77,6 +125,11 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
     }
 
+    /**
+     * Gets the depth of the XML element in the hierarchy.
+     *
+     * @return The depth of the XML element.
+     */
     val depth: Int
         get() {
             return if(parent == null){
@@ -86,6 +139,11 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
             }
         }
 
+    /**
+     * Converts the XML element and its children to a string representation.
+     *
+     * @return The string representation of the XML element.
+     */
     fun toText(): String {
         var indent = "\t".repeat(depth)
         val sb = StringBuilder()
@@ -110,6 +168,11 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         return sb.toString()
     }
 
+    /**
+     * Converts the XML element and its children to a string representation without colors to write in the file.
+     *
+     * @return The string representation of the XML element for file writing.
+     */
     fun textToFile(): String{
 
             var indent = "\t".repeat(depth)
@@ -144,14 +207,26 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     }
 }
 
-
+/**
+ * @constructor Represents an XML document.
+ */
 class XMLDocument {
     private var element: XMLElement? = null
 
+    /**
+     * Adds an XML element to the document.
+     *
+     * @param element The XML element to add to the document.
+     */
     fun addElement(element: XMLElement) {
         this.element = element
     }
 
+    /**
+     * Generates XML content as a string for console output.
+     *
+     * @return The XML content as a string.
+     */
     fun generateXMLConsole(): String {
 
         val sb = StringBuilder()
@@ -161,6 +236,11 @@ class XMLDocument {
         return sb.toString()
     }
 
+    /**
+     * Generates an XML file with the specified name.
+     *
+     * @param name The name of the XML file to generate.
+     */
     fun generateXMLFile(name: String){
 
         try {
@@ -181,14 +261,32 @@ class XMLDocument {
         }
     }
 
+    /**
+     * Accepts a visitor function to perform operations on the XML element and its children.
+     *
+     * @param visitor The visitor function to accept.
+     */
     fun accept(visitor: (XMLElement) -> Boolean){
         element!!.accept(visitor)
     }
 
+    /**
+     * Renames the name of the XML element if the name matches the old name.
+     *
+     * @param oldname The name of the element you want to change.
+     * @param newname The new name you want to be changed to.
+     */
     fun renameXMLElements(oldname: String, newname: String) {
         this.accept { if (it.name == oldname) it.name = newname; true }
     }
 
+    /**
+     * Renames the attribute with the elementname that matches the old name with a new name.
+     *
+     * @param elementname Identify the name of the element you will change the attribute.
+     * @param oldname The name of the attribute you will change.
+     * @param newname The name of what the attribute will be changed into.
+     */
     fun renameAttributes(elementname:String, oldname: String, newname: String){
         this.accept { if(it.name == elementname) it.renameAttribute(oldname, newname); true}
     }
@@ -201,10 +299,9 @@ class XMLDocument {
 
 }
 
-interface Visitor{
-    fun visit(xml: XMLElement):Boolean
-}
-
+/**
+ * Creates an example XML document.
+ */
 fun createExampleXML(){
     val document = XMLDocument()
 

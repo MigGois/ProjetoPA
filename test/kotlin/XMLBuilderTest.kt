@@ -4,6 +4,7 @@ import main.kotlin.createExampleXML
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
+
 internal const val red = "\u001b[31m"
 internal const val green = "\u001b[32m"
 internal const val brightred = "\u001b[38;5;210m"
@@ -42,6 +43,38 @@ class XMLLibraryTest {
 
         assertEquals(expectedXML, generatedXML)
     }
+
+
+    /*
+
+
+    @Test
+    fun addAndRemoveEntitiesTest() {
+        val document = XMLDocument()
+        val element = XMLElement("element")
+        document.addElement(element)
+
+        // Adding a new child entity
+        val newChild = XMLElement("newChild")
+        element.addChild(newChild)
+
+        // Removing the new child entity
+        element.removeChild("newChild", emptyMap())
+
+        val generatedXML = document.generateXMLConsole()
+
+        val expectedXML = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <element/>
+    """.trimIndent()
+
+        assertEquals(expectedXML, generatedXML)
+    }
+
+
+     */
+
+
 
 }
 
