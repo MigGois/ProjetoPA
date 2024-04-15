@@ -9,7 +9,7 @@ internal const val reset = "\u001b[0m"
 
 
 /**
-* Represents an XML element with a name, optional text content, and optional parent element.
+* Represents an [XMLelement] with a [name], optional [text] content, and optional [parent] element.
 *
 * @property name The name of the XML element.
 * @property text The text content of the XML element, if any.
@@ -26,69 +26,78 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     }
 
     /**
-     * Returns the parent XML element.
+     * @return the [XMLElement.name].
      */
     fun getElementName(): String{
         return name
     }
 
     /**
-     * Returns a list of names of child elements from the element.
+     * @return a [List] of [XMLElement.name] from the children of the element.
      */
     fun getChildrens(): List<String> {
         return children.map { it.name }
     }
 
     /**
-     * Returns the parent XML element.
+     * @return the [XMLElement.parent].
      */
     fun getParents(): XMLElement? {
         return parent
     }
 
     /**
-     * Adds a child XML element.
+     * Adds a [XMLElement] to the [XMLElement.children] list.
      *
-     * @param element The child XML element to add.
+     * @param element the [XMLElement] to add to the [XMLElement.children] list.
      */
-    fun addChild(element: XMLElement){
+    fun addElement(element: XMLElement){
         element.parent?.children?.remove(element)
         children.add(element)
         element.parent = this
     }
 
     /**
-     * Removes a child XML element by its name and attributes.
+     * Removes a [XMLElement.children] from the [XMLElement] by its name and attributes.
      *
-     * @param name The name of the child element to remove.
-     * @param attributes The attributes of the child element to match for removal.
+     * @param name The name of the [XMLElement.children] to remove.
+     * @param attributes The attributes of the [XMLElement.children] to match for removal.
      */
-    fun removeChild(name: String, attributes: Map<String, String>) {
+    fun removeElement(name: String, attributes: Map<String, String> = mapOf()) {
         val iterator = children.iterator()
         while (iterator.hasNext()) {
             val element = iterator.next()
-            if (element.name == name && element.attributes.entries.containsAll(attributes.entries)) {
-                element.parent = null
-                iterator.remove()
+                if (element.name == name && element.attributes.entries.containsAll(attributes.entries)) {
+                    element.parent = null
+                    iterator.remove()
             }
         }
     }
 
     /**
-     * Adds an attribute to the XML element.
+     * Adds an attribute to the [XMLElement].
      *
-     * @param key The key of the attribute.
-     * @param value The value of the attribute.
+     * @return the [XMLElement.attributes]
+     */
+    fun getAttributes(): Map<String, String> {
+        return attributes
+    }
+
+    /**
+     * Adds an attribute to the [XMLElement].
+     *
+     * @param key The key of the [attributes].
+     * @param value The value of the [attributes].
      */
     fun addAttribute(key: String, value: String) {
         attributes[key] = value
     }
 
     /**
-     * Updates an attribute with the specified key to the given value.
+     * Updates an [XMLElement.attributes] with the specified key to the given value.
      *
-     * @param key The key of the attribute to update.
-     * @param value The new value for the attribute.
+     * @param key The key of the [XMLElement.attributes] to update.
+     * @param value The new value for the [XMLElement.attributes].
      */
     fun updateAttribute(key: String, value: String) {
         if (attributes.containsKey(key)) {
@@ -99,7 +108,7 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     }
 
     /**
-     * Renames an attribute from the old key to the new key.
+     * Renames an [XMLElement.attributes] from the old key to the new key.
      *
      * @param key The current key of the attribute to rename.
      * @param newkey The new key for the attribute.
@@ -125,11 +134,6 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
     }
 
-    /**
-     * Gets the depth of the XML element in the hierarchy.
-     *
-     * @return The depth of the XML element.
-     */
     val depth: Int
         get() {
             return if(parent == null){
@@ -140,9 +144,9 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
 
     /**
-     * Converts the XML element and its children to a string representation.
+     * Converts the [XMLElement] and the [XMLElement.children] to a string representation.
      *
-     * @return The string representation of the XML element.
+     * @return The string representation of the [XMLElement].
      */
     fun toText(): String {
         var indent = "\t".repeat(depth)
@@ -169,9 +173,9 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     }
 
     /**
-     * Converts the XML element and its children to a string representation without colors to write in the file.
+     * Converts the [XMLElement] and the [XMLElement.children] to a string representation without colors to write in the file.
      *
-     * @return The string representation of the XML element for file writing.
+     * @return The string representation of the [XMLElement] for file writing.
      */
     fun textToFile(): String{
 
@@ -214,20 +218,30 @@ class XMLDocument {
     private var element: XMLElement? = null
 
     /**
-     * Adds an XML element to the document.
+     * Adds an [XMLElement] to be the root for to the [XMLDocument].
      *
-     * @param element The XML element to add to the document.
+     * @param element The [XMLElement] to add to the [XMLDocument].
      */
-    fun addElement(element: XMLElement) {
+    fun addRoot(element: XMLElement) {
         this.element = element
     }
 
     /**
-     * Generates XML content as a string for console output.
+     * Removes an [XMLElement] in the [XMLDocument].
+     *
+     * @param element The [XMLElement] to remove to the [XMLDocument].
+     */
+    fun removeElement(name: String) {
+        if(element?.name == name) element = null
+        this.accept { it.removeElement(name) ; true }
+    }
+
+    /**
+     * Generates XML content as a string.
      *
      * @return The XML content as a string.
      */
-    fun generateXMLConsole(): String {
+    fun generateXML(): String {
 
         val sb = StringBuilder()
         sb.append("$brightred<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -237,9 +251,9 @@ class XMLDocument {
     }
 
     /**
-     * Generates an XML file with the specified name.
+     * Generates a file with the specified name.
      *
-     * @param name The name of the XML file to generate.
+     * @param name The name of the file to generate.
      */
     fun generateXMLFile(name: String){
 
@@ -261,17 +275,22 @@ class XMLDocument {
         }
     }
 
-    /**
-     * Accepts a visitor function to perform operations on the XML element and its children.
-     *
-     * @param visitor The visitor function to accept.
-     */
     fun accept(visitor: (XMLElement) -> Boolean){
         element!!.accept(visitor)
     }
 
     /**
-     * Renames the name of the XML element if the name matches the old name.
+     * Adds an attribute to the [XMLElement].
+     *
+     * @param name is the name to add in the [XMLElement.attributes] in the [XMLElement].
+     * @param attributevalue The name of the attribute in the [XMLElement.attributes] of the [XMLElement].
+     */
+    fun addAttribute(name: String, attributename: String, attributevalue: String) {
+        this.accept { if (it.name == name) it.addAttribute(attributename, attributevalue); true }
+    }
+
+    /**
+     * Renames the [XMLElement.name] of the [XMLElement].
      *
      * @param oldname The name of the element you want to change.
      * @param newname The new name you want to be changed to.
@@ -281,7 +300,7 @@ class XMLDocument {
     }
 
     /**
-     * Renames the attribute with the elementname that matches the old name with a new name.
+     * Renames the attribute on the element that matches the elementname.
      *
      * @param elementname Identify the name of the element you will change the attribute.
      * @param oldname The name of the attribute you will change.
@@ -289,6 +308,16 @@ class XMLDocument {
      */
     fun renameAttributes(elementname:String, oldname: String, newname: String){
         this.accept { if(it.name == elementname) it.renameAttribute(oldname, newname); true}
+    }
+
+    /**
+     * Removes the attribute of the specified entity
+     *
+     * @param entityname Identify the name of the element you will remove the attribute.
+     * @param attributename The name of the attribute you will remove.
+     */
+    fun removeAttributes(entityname:String, attributename: String){
+        this.accept { if(it.name == entityname) it.removeAttribute(attributename); true}
     }
 
     fun xPath(name: String): List<XMLElement>{
@@ -302,11 +331,11 @@ class XMLDocument {
 /**
  * Creates an example XML document.
  */
-fun createExampleXML(){
+fun createExampleXML(): String {
     val document = XMLDocument()
 
     val plano = XMLElement("plano")
-    document.addElement(plano)
+    document.addRoot(plano)
 
     val curso = XMLElement("curso", "Mestrado em Engenharia Informática", plano)
 
@@ -344,12 +373,15 @@ fun createExampleXML(){
     componente5.addAttribute("nome", "Discussão")
     componente5.addAttribute("peso", "20%")
 
-    document.renameXMLElements("componente", "bacano")
-    document.renameAttributes("bacano","nome", "apelido")
-
-    println(document.generateXMLConsole().trimIndent())
+    println(document.generateXML().trimIndent())
     document.generateXMLFile("teste.xml")
     println("Childrens:" + avaliacao2.getChildrens())
+
+    //document.renameXMLElements("componente", "bacano")
+    //document.renameAttributes("bacano","nome", "apelido")
+
+    return document.generateXML().trimIndent()
+
 
 }
 
