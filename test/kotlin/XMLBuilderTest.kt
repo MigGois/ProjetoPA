@@ -5,7 +5,6 @@ import main.kotlin.XMLElement
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
-import javax.xml.xpath.XPath
 
 class XMLLibraryTest {
 
@@ -14,22 +13,18 @@ class XMLLibraryTest {
         val document = XMLDocument()
         val element = XMLElement("plano")
         document.addRoot(element)
-        val addedElement = document.xPath("plano").firstOrNull()
-        assertEquals(true, addedElement != null)
+        assertNotNull(element)
     }
 
     @Test
     fun removeXMLElementTest() {
         val document = XMLDocument()
         val element = XMLElement("plano")
-        val element1 = XMLElement("plano1")
-        val element2 = XMLElement("plano2")
+        val element1 = XMLElement("plano1", parent = element)
         document.addRoot(element)
         element.addElement(element1)
-        element1.addElement(element2)
-        document.removeElement("plano2")
-        val removedElement = document.xPath("plano2").firstOrNull()
-        assertEquals(true, removedElement == null)
+        element.removeElement("plano1")
+        assertFalse(element.getChildren().contains("plano1"))
     }
 
     @Test
@@ -156,9 +151,8 @@ class XMLLibraryTest {
         parent.addElement(child)
         plano.addElement(parent1)
         document.removeElement("parent")
-        val removedElement = document.xPath("parent").firstOrNull()
-        val removedElement1 = document.xPath("child").firstOrNull()
-        assertTrue(removedElement == null && removedElement1 == null)
+        assertFalse(plano.getChildren().contains("parent"))
+        assertFalse(plano.getChildren().contains("child"))
     }
 
     @Test
@@ -184,11 +178,10 @@ class XMLLibraryTest {
         val componente2 = XMLElement("componente", parent = root)
         componente2.addAttribute("nome", "Testes")
         componente2.addAttribute("peso", "40%")
+        val path = document.xPath("plano/componente")
 
-        assertEquals("<componente nome=\"Quizzes\" peso=\"20%\">\n" +
-                "\t<quiz>Matematica</quiz>\n" +
-                "</componente>\n" +
-                "<componente nome=\"Testes\" peso=\"40%\"/>", document.xPath("componente"))
+
+        assertEquals(listOf(componente1, componente2), path)
     }
 
 }

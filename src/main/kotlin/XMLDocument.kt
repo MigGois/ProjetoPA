@@ -143,6 +143,15 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
             }
         }
 
+    val path: String
+        get() {
+            return if(parent == null){
+                ""
+            }else{
+                parent!!.name + "/" + name
+            }
+        }
+
     /**
      * Converts the [XMLElement] and the [XMLElement.children] to a string representation.
      *
@@ -233,8 +242,13 @@ class XMLDocument {
      */
     fun removeElement(name: String) {
         if(element?.name == name) element = null
-        this.accept { it.removeElement(name) ; true }
+        accept { it.removeElement(name) ; true }
     }
+
+    /*fun removeElement(name: String) {
+        if(element?.name == name) element = null
+        this.accept { it.removeElement(name) ; true }
+    }*/
 
     /**
      * Generates XML content as a string.
@@ -286,7 +300,7 @@ class XMLDocument {
      * @param attributevalue The name of the attribute in the [XMLElement.attributes] of the [XMLElement].
      */
     fun addAttribute(name: String, attributename: String, attributevalue: String) {
-        this.accept { if (it.name == name) it.addAttribute(attributename, attributevalue); true }
+        accept { if (it.name == name) it.addAttribute(attributename, attributevalue); true }
     }
 
     /**
@@ -296,7 +310,7 @@ class XMLDocument {
      * @param newname The new name you want to be changed to.
      */
     fun renameXMLElements(oldname: String, newname: String) {
-        this.accept { if (it.name == oldname) it.name = newname; true }
+        accept { if (it.name == oldname) it.name = newname; true }
     }
 
     /**
@@ -307,7 +321,7 @@ class XMLDocument {
      * @param newname The name of what the attribute will be changed into.
      */
     fun renameAttributes(elementname:String, oldname: String, newname: String){
-        this.accept { if(it.name == elementname) it.renameAttribute(oldname, newname); true}
+        accept { if(it.name == elementname) it.renameAttribute(oldname, newname); true}
     }
 
     /**
@@ -317,19 +331,13 @@ class XMLDocument {
      * @param attributename The name of the attribute you will remove.
      */
     fun removeAttributes(entityname:String, attributename: String){
-        this.accept { if(it.name == entityname) it.removeAttribute(attributename); true}
+        accept { if(it.name == entityname) it.removeAttribute(attributename); true}
     }
 
-    /*fun xPath(name: String): List<XMLElement>{
+    fun xPath(path: String): List<XMLElement>{
         val list = mutableListOf<XMLElement>()
-        this.accept { if(it.name == name) list.add(it); true }
+        accept { if(it.path.endsWith(path)) list.add(it); true }
         return list
-    }*/
-
-    fun xPath(name: String): String{
-        val sb = StringBuilder()
-        this.accept { if(it.name == name) sb.append(it.textToFile()); true }
-        return sb.toString().trimIndent()
     }
 
 }
