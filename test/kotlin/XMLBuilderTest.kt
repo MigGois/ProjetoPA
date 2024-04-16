@@ -180,11 +180,14 @@ class XMLLibraryTest {
         val componente1 = XMLElement("componente", parent = root)
         componente1.addAttribute("nome", "Quizzes")
         componente1.addAttribute("peso", "20%")
+        val teste = XMLElement("quiz", "Matematica", componente1)
         val componente2 = XMLElement("componente", parent = root)
         componente2.addAttribute("nome", "Testes")
         componente2.addAttribute("peso", "40%")
 
-        assertEquals("<componente nome=\"Quizzes\" peso=\"20%\"/>\n" +
+        assertEquals("<componente nome=\"Quizzes\" peso=\"20%\">\n" +
+                "\t<quiz>Matematica</quiz>\n" +
+                "</componente>\n" +
                 "<componente nome=\"Testes\" peso=\"40%\"/>", document.xPath("componente"))
     }
 
