@@ -35,7 +35,7 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
     /**
      * @return a [List] of [XMLElement.name] from the children of the element.
      */
-    fun getChildrens(): List<String> {
+    fun getChildren(): List<String> {
         return children.map { it.name }
     }
 
@@ -375,7 +375,7 @@ fun createExampleXML(): String {
 
     println(document.generateXML().trimIndent())
     document.generateXMLFile("teste.xml")
-    println("Childrens:" + avaliacao2.getChildrens())
+    println("Childrens:" + avaliacao2.getChildren())
 
     //document.renameXMLElements("componente", "bacano")
     //document.renameAttributes("bacano","nome", "apelido")

@@ -6,12 +6,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
 
-
-internal const val red = "\u001b[31m"
-internal const val green = "\u001b[32m"
-internal const val brightred = "\u001b[38;5;210m"
-internal const val reset = "\u001b[0m"
-
 class XMLLibraryTest {
 
     @Test
@@ -69,14 +63,13 @@ class XMLLibraryTest {
     }
 
     @Test
-    fun accessChildEntitiesTest() {
+    fun accessChildEntityTest() {
         val parent = XMLElement("parent")
         val child1 = XMLElement("child1")
         val child2 = XMLElement("child2")
         parent.addElement(child1)
         parent.addElement(child2)
-        val childrenNames = parent.getChildrens()
-        assertEquals(listOf("child1", "child2"), childrenNames)
+        assertEquals(listOf("child1","child2"), parent.getChildren())
     }
 
     @Test
@@ -123,58 +116,35 @@ class XMLLibraryTest {
     }
 
     @Test
-    fun visitElementsTest() {
-        val parent = XMLElement("parent")
-        val child1 = XMLElement("child1")
-        val child2 = XMLElement("child2")
-        parent.addElement(child1)
-        parent.addElement(child2)
-
-        val visitedElements = mutableListOf<String>()
-        val visitor: (XMLElement) -> Boolean = { element ->
-            visitedElements.add(element.getElementName())
-            true
-        }
-        parent.accept(visitor)
-        assertEquals(listOf("parent", "child1", "child2"), visitedElements)
-    }
-
-    @Test
     fun addAttributesGloballyTest() {
         val document = XMLDocument()
-        val parent = XMLElement("parent")
-        val child = XMLElement("child")
-        parent.addElement(child)
-        document.addRoot(parent)
-        val addAttributesGlobally: (XMLElement) -> Boolean = { element ->
-            if (element.getElementName() == "child") {
-                element.addAttribute("globalAttribute", "value")
-            }
-            true
-        }
-        document.accept(addAttributesGlobally)
-        assertEquals("value", child.getAttributes()["globalAttribute"])
+        val root = XMLElement("plano")
+        document.addRoot(root)
+        document.addAttribute("plano", "peso", "10%")
+        assertEquals("10%", root.getAttributes().getValue("peso"))
     }
 
     @Test
     fun renameEntitiesGloballyTest() {
         val document = XMLDocument()
-        val parent = XMLElement("oldName")
-        val child = XMLElement("child")
-        parent.addElement(child)
-        document.addRoot(parent)
-        val renameEntitiesGlobally: (XMLElement) -> Boolean = { element ->
-            if (element.getElementName() == "oldName") {
-                element.name = "newName"
-            }
-            true
-        }
-        document.accept(renameEntitiesGlobally)
-        assertEquals("newName", parent.getElementName())
+        val root = XMLElement("plano")
+        document.addRoot(root)
+        document.renameXMLElements("plano", "teste")
+        assertEquals("teste", root.getElementName())
     }
 
     @Test
-    fun removeEntitiesGloballyTest1() {
+    fun renameAttributesGloballyTest() {
+        val document = XMLDocument()
+        val root = XMLElement("plano")
+        document.addRoot(root)
+        document.addAttribute("plano", "peso", "10%")
+        document.renameAttributes("plano" ,"peso", "test")
+        assertTrue(root.getAttributes().containsKey("test"))
+    }
+
+    @Test
+    fun removeEntitiesGloballyTest() {
         val document = XMLDocument()
         val parent = XMLElement("parent")
         val parent1 = XMLElement("parent1")
@@ -187,7 +157,18 @@ class XMLLibraryTest {
         document.removeElement("parent")
         val removedElement = document.xPath("parent").firstOrNull()
         val removedElement1 = document.xPath("child").firstOrNull()
-        assertEquals(true, removedElement == null && removedElement1 == null)
+        assertTrue(removedElement == null && removedElement1 == null)
     }
+
+    @Test
+    fun removeAttributesGloballyTest() {
+        val document = XMLDocument()
+        val root = XMLElement("plano")
+        document.addRoot(root)
+        document.addAttribute("plano", "peso", "10%")
+        document.removeAttributes("plano", "peso")
+        assertFalse(root.getAttributes().containsKey("peso"))
+    }
+
 }
 
