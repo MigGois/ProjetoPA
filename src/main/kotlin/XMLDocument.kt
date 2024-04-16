@@ -320,10 +320,16 @@ class XMLDocument {
         this.accept { if(it.name == entityname) it.removeAttribute(attributename); true}
     }
 
-    fun xPath(name: String): List<XMLElement>{
+    /*fun xPath(name: String): List<XMLElement>{
         val list = mutableListOf<XMLElement>()
         this.accept { if(it.name == name) list.add(it); true }
         return list
+    }*/
+
+    fun xPath(name: String): String{
+        val sb = StringBuilder()
+        this.accept { if(it.name == name) sb.append(it.textToFile()); true }
+        return sb.toString().trimIndent()
     }
 
 }
@@ -376,9 +382,6 @@ fun createExampleXML(): String {
     println(document.generateXML().trimIndent())
     document.generateXMLFile("teste.xml")
     println("Childrens:" + avaliacao2.getChildren())
-
-    //document.renameXMLElements("componente", "bacano")
-    //document.renameAttributes("bacano","nome", "apelido")
 
     return document.generateXML().trimIndent()
 

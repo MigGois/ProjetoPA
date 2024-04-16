@@ -5,6 +5,7 @@ import main.kotlin.XMLElement
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
+import javax.xml.xpath.XPath
 
 class XMLLibraryTest {
 
@@ -168,6 +169,23 @@ class XMLLibraryTest {
         document.addAttribute("plano", "peso", "10%")
         document.removeAttributes("plano", "peso")
         assertFalse(root.getAttributes().containsKey("peso"))
+    }
+
+    @Test
+    fun xPathTest() {
+        val document = XMLDocument()
+        val root = XMLElement("plano")
+        document.addRoot(root)
+        val nome = XMLElement("nome", "Dissertação", root)
+        val componente1 = XMLElement("componente", parent = root)
+        componente1.addAttribute("nome", "Quizzes")
+        componente1.addAttribute("peso", "20%")
+        val componente2 = XMLElement("componente", parent = root)
+        componente2.addAttribute("nome", "Testes")
+        componente2.addAttribute("peso", "40%")
+
+        assertEquals("<componente nome=\"Quizzes\" peso=\"20%\"/>\n" +
+                "<componente nome=\"Testes\" peso=\"40%\"/>", document.xPath("componente"))
     }
 
 }
