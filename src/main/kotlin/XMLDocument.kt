@@ -202,7 +202,7 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
                 if(attributes.isEmpty()){
                     sb.append("></$name>\n")
                 }else {
-                    sb.append("$brightred/>\n")
+                    sb.append("/>\n")
                 }
             } else {
                 if (text != null) {
