@@ -165,7 +165,11 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
             sb.append(" $green$key$brightred=\"$reset$value$brightred\"")
         }
         if (children.isEmpty() && text == null) {
-            sb.append("$brightred/>\n")
+            if(attributes.isEmpty()){
+                sb.append("$brightred></$red$name$reset$brightred>$reset\n")
+            }else {
+                sb.append("$brightred/>\n")
+            }
         } else {
             if (text != null) {
                 sb.append("$brightred>$reset$text")
@@ -195,7 +199,11 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
                 sb.append(" $key=\"$value\"")
             }
             if (children.isEmpty() && text == null) {
-                sb.append("/>\n")
+                if(attributes.isEmpty()){
+                    sb.append("></$name>\n")
+                }else {
+                    sb.append("$brightred/>\n")
+                }
             } else {
                 if (text != null) {
                     sb.append(">$text")
@@ -241,14 +249,9 @@ class XMLDocument {
      * @param element The [XMLElement] to remove to the [XMLDocument].
      */
     fun removeElement(name: String) {
-        if(element?.name == name) element = null
+        if(element?.name == name){ element = null; return}
         accept { it.removeElement(name) ; true }
     }
-
-    /*fun removeElement(name: String) {
-        if(element?.name == name) element = null
-        this.accept { it.removeElement(name) ; true }
-    }*/
 
     /**
      * Generates XML content as a string.
@@ -345,7 +348,7 @@ class XMLDocument {
 /**
  * Creates an example XML document.
  */
-fun createExampleXML(): String {
+fun createExampleXML(){
     val document = XMLDocument()
 
     val plano = XMLElement("plano")
@@ -389,10 +392,6 @@ fun createExampleXML(): String {
 
     println(document.generateXML().trimIndent())
     document.generateXMLFile("teste.xml")
-    println("Childrens:" + avaliacao2.getChildren())
-
-    return document.generateXML().trimIndent()
-
 
 }
 
