@@ -9,7 +9,7 @@ internal const val reset = "\u001b[0m"
 
 
 /**
-* Represents an [XMLelement] with a [name], optional [text] content, and optional [parent] element.
+* Represents an [XMLElement] with a [name], optional [text] content, and optional [parent] element.
 *
 * @property name The name of the XML element.
 * @property text The text content of the XML element, if any.
@@ -153,7 +153,7 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         }
 
     /**
-     * Converts the [XMLElement] and the [XMLElement.children] to a string representation.
+     * Converts the [XMLElement] and the [XMLElement.children] to a string representation with colors.
      *
      * @return The string representation of the [XMLElement].
      */
