@@ -16,6 +16,16 @@ annotation class AttributeXML(
 )
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
+annotation class AttributePercentage(
+    val name: String
+)
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
+annotation class XmlString(
+    val addpercent: KClass<AddPercentage>
+)
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
 annotation class ExcludeXML
 
 @ElementXML ("componente")
@@ -39,6 +49,17 @@ class fuc(
     val avaliacao: List<componenteavaliacao>
 )
 
+@AttributePercentage("nome")
+class percentagem(
+    val nome: String,
+    @XmlString(AddPercentage::class)
+    val peso: Int
+)
+
+class AddPercentage(obj: Any) {
+
+}
+
 //OPERADOR ELVIS
 
 fun translate(obj: Any): XMLElement {
@@ -59,7 +80,7 @@ fun translate(obj: Any): XMLElement {
                     }
                 }
             }else{
-                XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name, prop.getter.call(obj).toString() ?: "", xmlElement)
+                XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name, prop.getter.call(obj).toString(), xmlElement)
             }
         }
     }
@@ -82,6 +103,7 @@ fun main(){
             componenteavaliacao("Projeto", 80)
         )
     )
+    val p = percentagem("peso", 30)
     val sql: XMLElement = translate(f)
     println(sql.toText())
 
