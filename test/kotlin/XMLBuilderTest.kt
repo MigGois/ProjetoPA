@@ -168,20 +168,42 @@ class XMLLibraryTest {
     @Test
     fun xPathTest() {
         val document = XMLDocument()
-        val root = XMLElement("plano")
-        document.addRoot(root)
-        val nome = XMLElement("nome", "Dissertação", root)
-        val componente1 = XMLElement("componente", parent = root)
+        val plano = XMLElement("plano")
+        document.addRoot(plano)
+
+        val curso = XMLElement("curso", "Mestrado em Engenharia Informática", plano)
+
+        val fuc1 = XMLElement("fuc", parent = plano)
+        fuc1.addAttribute("codigo", "M4310")
+
+        val nome1 = XMLElement("nome", "Programação Avançada", fuc1)
+        val ects1 = XMLElement("ects", "6.0", fuc1)
+        val avaliacao1 = XMLElement("avaliacao", parent =  fuc1)
+
+        val componente1 = XMLElement("componente", parent = avaliacao1)
         componente1.addAttribute("nome", "Quizzes")
         componente1.addAttribute("peso", "20%")
-        val teste = XMLElement("quiz", "Matematica", componente1)
-        val componente2 = XMLElement("componente", parent = root)
-        componente2.addAttribute("nome", "Testes")
-        componente2.addAttribute("peso", "40%")
-        val path = document.xPath("plano/componente")
+
+        val componente2 = XMLElement("componente", parent = avaliacao1)
+        componente2.addAttribute("nome", "Projeto")
+        componente2.addAttribute("peso", "80%")
+
+        val fuc2 = XMLElement("fuc", parent = plano)
+        fuc2.addAttribute("codigo", "03782")
+
+        val nome2 = XMLElement("nome", "Dissertação", fuc2)
+        val ects2 = XMLElement("ects", "42.0", fuc2)
+        val avaliacao2 = XMLElement("avaliacao", parent = fuc2)
+
+        val componente3 = XMLElement("componente", parent = avaliacao2)
+        componente3.addAttribute("nome", "Dissertação")
+        componente3.addAttribute("peso", "60%")
 
 
-        assertEquals(listOf(componente1, componente2), path)
+        val path = document.xPath("avaliacao/componente")
+
+
+        assertEquals(listOf(componente1, componente2, componente3), path)
     }
 
 }

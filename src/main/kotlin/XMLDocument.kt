@@ -17,7 +17,7 @@ internal const val reset = "\u001b[0m"
 * @constructor Creates an XML element with name, text and parent.
 */
 
-class XMLElement(var name: String, var text: String? = null, var parent: XMLElement? = null) {
+class XMLElement(var name: String, var text: String = "", var parent: XMLElement? = null) {
     private val children = mutableListOf<XMLElement>()
     private val attributes = mutableMapOf<String, String>()
 
@@ -168,14 +168,12 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
         for ((key, value) in attributes) {
             sb.append(" $green$key$brightred=\"$reset$value$brightred\"")
         }
-        if (children.isEmpty() && text == null) {
-            if(attributes.isEmpty()){
-                sb.append("$brightred></$red$name$reset$brightred>$reset\n")
-            }else {
+        if (children.isEmpty() && text == "") {
+
                 sb.append("$brightred/>\n")
-            }
+
         } else {
-            if (text != null) {
+            if (text != "") {
                 sb.append("$brightred>$reset$text")
                 indent = "\t".repeat(0)
             }else{
@@ -202,14 +200,12 @@ class XMLElement(var name: String, var text: String? = null, var parent: XMLElem
             for ((key, value) in attributes) {
                 sb.append(" $key=\"$value\"")
             }
-            if (children.isEmpty() && text == null) {
-                if(attributes.isEmpty()){
-                    sb.append("></$name>\n")
-                }else {
+            if (children.isEmpty() && text == "") {
+
                     sb.append("/>\n")
-                }
+
             } else {
-                if (text != null) {
+                if (text != "") {
                     sb.append(">$text")
                     indent = "\t".repeat(0)
                 } else {
