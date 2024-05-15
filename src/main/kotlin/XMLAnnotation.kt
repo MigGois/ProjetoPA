@@ -21,6 +21,9 @@ annotation class AttributePercentage(
 )
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
+annotation class XmlDelist()
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
 annotation class XmlString(
     val addpercent: KClass<AddPercentage>
 )
@@ -32,8 +35,9 @@ annotation class ExcludeXML
 class componenteavaliacao(
     @AttributeXML("nome")
     val nome: String,
-    @AttributeXML("peso")
-    val peso: Int)
+    @XmlString(AddPercentage::class)
+    val peso: Int
+)
 
 @ElementXML ("fuc")
 class fuc(
@@ -46,19 +50,16 @@ class fuc(
     @ExcludeXML
     val observacoes: String,
     @ElementXML("avaliacao")
+    @XmlDelist
     val avaliacao: List<componenteavaliacao>
 )
 
-@AttributePercentage("nome")
-class percentagem(
-    val nome: String,
-    @XmlString(AddPercentage::class)
-    val peso: Int
-)
-
-class AddPercentage(obj: Any) {
-
+class AddPercentage(private val value: Any) {
+    override fun toString(): String {
+        return "$value%"
+    }
 }
+
 
 //OPERADOR ELVIS
 
@@ -67,19 +68,33 @@ fun translate(obj: Any): XMLElement {
 
     obj::class.classFields.forEach{ prop ->
         if(prop.hasAnnotation<ExcludeXML>()){
-        }else if(prop.hasAnnotation<AttributeXML>()) {
+        }
+        else if(prop.hasAnnotation<AttributeXML>()) {
             val propName = prop.findAnnotation<AttributeXML>()?.name ?: prop.name
             val propValue = prop.getter.call(obj)?.toString() ?: "null"
             xmlElement.addAttribute(propName, propValue)
+        }else if(prop.hasAnnotation<XmlString>()) {
+            val addPercentageClass = prop.findAnnotation<XmlString>()?.addpercent
+            val addPercentageValue = addPercentageClass?.primaryConstructor?.call(prop.getter.call(obj))
+            xmlElement.addAttribute(prop.name, addPercentageValue.toString())
+
         }else if(prop.hasAnnotation<ElementXML>()){
             if(prop.getter.call(obj) is List<*>){
+                if(prop.hasAnnotation<XmlDelist>()){
+                    (prop.getter.call(obj) as List<*>).forEach { element ->
+                        if (element != null) {
+                            xmlElement.addElement(translate(element))
+                        }
+                    }
+                } else {
                 val element1 = XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name,"", xmlElement)
                 (prop.getter.call(obj) as List<*>).forEach { element ->
                     if (element != null) {
                         element1.addElement(translate(element))
                     }
                 }
-            }else{
+                    }
+            } else {
                 XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name, prop.getter.call(obj).toString(), xmlElement)
             }
         }
@@ -103,7 +118,6 @@ fun main(){
             componenteavaliacao("Projeto", 80)
         )
     )
-    val p = percentagem("peso", 30)
     val sql: XMLElement = translate(f)
     println(sql.toText())
 
