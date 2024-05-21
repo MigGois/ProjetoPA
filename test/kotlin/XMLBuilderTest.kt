@@ -20,7 +20,7 @@ class XMLLibraryTest {
     fun removeXMLElementTest() {
         val document = XMLDocument()
         val element = XMLElement("plano")
-        val element1 = XMLElement("plano1", parent = element)
+        val element1 = XMLElement("planonovo", parent = element)
         document.addRoot(element)
         element.addElement(element1)
         element.removeElement("plano1")
@@ -61,25 +61,25 @@ class XMLLibraryTest {
     @Test
     fun accessChildEntityTest() {
         val parent = XMLElement("parent")
-        val child1 = XMLElement("child1")
-        val child2 = XMLElement("child2")
+        val child1 = XMLElement("childum")
+        val child2 = XMLElement("childdois")
         parent.addElement(child1)
         parent.addElement(child2)
-        assertEquals(listOf("child1","child2"), parent.getChildren())
+        assertEquals(listOf("childum","childdois"), parent.getChildren())
     }
 
     @Test
     fun prettyPrintToStringTest() {
         val parent = XMLElement("parent")
-        val child1 = XMLElement("child1", "content1")
-        val child2 = XMLElement("child2", "content2")
+        val child1 = XMLElement("childum", "content1")
+        val child2 = XMLElement("childdois", "content2")
         parent.addElement(child1)
         parent.addElement(child2)
         val prettyPrintedXML = parent.toText().trimIndent()
         val expectedPrettyPrintedXML = "" +
                 "\u001B[38;5;210m<\u001B[31mparent\u001B[0m\u001B[38;5;210m>\u001B[0m\n" +
-                "\t\u001B[38;5;210m<\u001B[31mchild1\u001B[0m\u001B[38;5;210m>\u001B[0mcontent1\u001B[38;5;210m</\u001B[31mchild1\u001B[38;5;210m>\u001B[0m\n" +
-                "\t\u001B[38;5;210m<\u001B[31mchild2\u001B[0m\u001B[38;5;210m>\u001B[0mcontent2\u001B[38;5;210m</\u001B[31mchild2\u001B[38;5;210m>\u001B[0m\n" +
+                "\t\u001B[38;5;210m<\u001B[31mchildum\u001B[0m\u001B[38;5;210m>\u001B[0mcontent1\u001B[38;5;210m</\u001B[31mchildum\u001B[38;5;210m>\u001B[0m\n" +
+                "\t\u001B[38;5;210m<\u001B[31mchilddois\u001B[0m\u001B[38;5;210m>\u001B[0mcontent2\u001B[38;5;210m</\u001B[31mchilddois\u001B[38;5;210m>\u001B[0m\n" +
                 "\u001B[38;5;210m</\u001B[31mparent\u001B[38;5;210m>\u001B[0m"
 
         assertEquals(expectedPrettyPrintedXML, prettyPrintedXML)
@@ -88,8 +88,8 @@ class XMLLibraryTest {
     @Test
     fun writeToFileTest() {
         val parent = XMLElement("parent")
-        val child1 = XMLElement("child1", "content1")
-        val child2 = XMLElement("child2", "content2")
+        val child1 = XMLElement("childum", "content1")
+        val child2 = XMLElement("childdois", "content2")
         parent.addElement(child1)
         parent.addElement(child2)
         val document = XMLDocument()
@@ -103,8 +103,8 @@ class XMLLibraryTest {
         val expectedFileContent = "" +
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<parent>\n" +
-                "\t<child1>content1</child1>\n" +
-                "\t<child2>content2</child2>\n" +
+                "\t<childum>content1</childum>\n" +
+                "\t<childdois>content2</childdois>\n" +
                 "</parent>"
 
         assertEquals(expectedFileContent, fileContent)
@@ -143,7 +143,7 @@ class XMLLibraryTest {
     fun removeEntitiesGloballyTest() {
         val document = XMLDocument()
         val parent = XMLElement("parent")
-        val parent1 = XMLElement("parent1")
+        val parent1 = XMLElement("parentum")
         val child = XMLElement("child")
         val plano = XMLElement("plano")
         document.addRoot(plano)
