@@ -22,7 +22,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
     private val attributes = mutableMapOf<String, String>()
 
     init {
-        if(text != null) {
+        if(text != "") {
             children.clear()
         }
         require(name.matches(Regex("[a-z]+")))

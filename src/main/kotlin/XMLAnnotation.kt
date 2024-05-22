@@ -62,7 +62,7 @@ interface ChangeAttribute{
 
 class AddPercentage: ChangeAttribute {
     override fun changeValue(value: Any): String {
-        return "$value"
+        return "$value%"
     }
 }
 
@@ -76,8 +76,25 @@ class FUCAdapter: ChangeXML {
     }
 }
 
+//DSL
+fun xml(name: String, block: XMLElement.() -> Unit): XMLElement {
+    val element = XMLElement(name)
+    element.block()
+    return element
+}
 
-fun translate(obj: Any): XMLElement {
+fun XMLElement.element(name: String, block: XMLElement.() -> Unit) {
+    val child = XMLElement(name)
+    child.block()
+    this.addElement(child)
+}
+
+fun XMLElement.attribute(name: String, value: String) {
+    this.addAttribute(name, value)
+}
+
+
+    fun translate(obj: Any): XMLElement {
 
     val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.isNullOrEmpty()) {
         XMLElement(obj::class.simpleName!!, obj::class.findAnnotation<ElementXML>()?.text ?: "")
@@ -108,32 +125,25 @@ fun translate(obj: Any): XMLElement {
                         }
                     }
                 } else {
-                val element1 = XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name,"", xmlElement)
-                (prop.getter.call(obj) as List<*>).forEach { element ->
-                    if (element != null) {
-                        element1.addElement(translate(element))
+                    val element1 = XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name,"", xmlElement)
+                    (prop.getter.call(obj) as List<*>).forEach { element ->
+                        if (element != null) {
+                            element1.addElement(translate(element))
+                        }
                     }
                 }
-                    }
-            } else {
-                XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name, prop.getter.call(obj).toString(), xmlElement)
             }
         }
+    }
+
+    if (xmlElement::class.hasAnnotation<XMLadapter>()) {
+        val changeAttributeClass = xmlElement::class.findAnnotation<XMLadapter>()!!.adapter
+        return changeAttributeClass.createInstance().changeElement(xmlElement)
     }
 
     return xmlElement
 }
 
-/*fun changeXML(element: XMLElement, list: List<Any>): XMLElement {
-    if (element::class.hasAnnotation<XMLadapter>()) {
-        println("teste1")
-        val changeAttributeClass = element::class.findAnnotation<XMLadapter>()?.adapter
-        val changeAttributeInstance = changeAttributeClass?.createInstance()
-        val modifiedValue = changeAttributeInstance!!.changeElement(element)
-        return modifiedValue
-    }
-    return element
-}*/
 
 val KClass<*>.classFields: List<KProperty<*>>
     get() {
@@ -150,7 +160,8 @@ fun main(){
             componenteavaliacao("Projeto", 80)
         )
     )
-    val sql: XMLElement = translate(c)
-    println(sql)
+
+    val fucXml: XMLElement = translate(f)
+    println(fucXml.toText())
 
 }
