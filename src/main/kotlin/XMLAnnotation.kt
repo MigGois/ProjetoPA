@@ -76,24 +76,6 @@ class FUCAdapter: ChangeXML {
     }
 }
 
-//DSL
-fun xml(name: String, block: XMLElement.() -> Unit): XMLElement {
-    val element = XMLElement(name)
-    element.block()
-    return element
-}
-
-fun XMLElement.element(name: String, block: XMLElement.() -> Unit) {
-    val child = XMLElement(name)
-    child.block()
-    this.addElement(child)
-}
-
-fun XMLElement.attribute(name: String, value: String) {
-    this.addAttribute(name, value)
-}
-
-
     fun translate(obj: Any): XMLElement {
 
     val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.isNullOrEmpty()) {
