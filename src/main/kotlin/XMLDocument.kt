@@ -23,7 +23,9 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
 
     init {
         if(text != "") {
-            children.clear()
+            if(children.size > 0) {
+                throw IllegalArgumentException("Children is not empty")
+            }
         }
         require(name.matches(Regex("[a-z]+")))
         parent?.children?.add(this)
@@ -39,8 +41,8 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
     /**
      * @return a [List] of [XMLElement.name] from the children of the element.
      */
-    fun getChildren(): List<String> {
-        return children.map { it.name }
+    fun getChildren(): List<XMLElement> {
+        return children
     }
 
     /**
@@ -107,7 +109,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
         if (attributes.containsKey(key)) {
             attributes[key] = value
         } else {
-            println("Atributo '$key' não existe.")
+            throw IllegalArgumentException("Atributo '$key' não existe.")
         }
     }
 
@@ -121,7 +123,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
         if (attributes.containsKey(key)) {
             attributes[newkey] = attributes.remove(key)!!
         } else {
-            println("Atributo '$key' não existe.")
+            throw IllegalArgumentException("Atributo '$key' não existe.")
         }
     }
 
