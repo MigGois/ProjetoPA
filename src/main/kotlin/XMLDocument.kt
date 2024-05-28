@@ -69,13 +69,14 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
      * @param name The name of the [XMLElement.children] to remove.
      * @param attributes The attributes of the [XMLElement.children] to match for removal.
      */
-    fun removeElement(name: String, attributes: Map<String, String> = mapOf()) {
+    fun removeElement(name: String) {
         val iterator = children.iterator()
         while (iterator.hasNext()) {
-            val element = iterator.next()
-                if (element.name == name && element.attributes.entries.containsAll(attributes.entries)) {
-                    element.parent = null
-                    iterator.remove()
+            val child = iterator.next()
+            if (child.getElementName() == name) {
+                iterator.remove() // Remove the child if it matches the name
+            } else {
+                child.removeElement(name) // Recursively remove from children
             }
         }
     }
@@ -391,6 +392,8 @@ fun createExampleXML(){
     val componente5 = XMLElement("componente", parent = avaliacao2)
     componente5.addAttribute("nome", "Discussão")
     componente5.addAttribute("peso", "20%")
+
+    document.removeElement("componente")
 
     println(document.generateXML().trimIndent())
     document.generateXMLFile("teste.xml")
