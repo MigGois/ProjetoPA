@@ -141,15 +141,6 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
         }
     }
 
-    val depth: Int
-        get() {
-            return if(parent == null){
-                0
-            }else{
-                1 + parent!!.depth
-            }
-        }
-
     val path: String
         get() {
             return if(parent == null){
@@ -164,8 +155,8 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
      *
      * @return The string representation of the [XMLElement].
      */
-    fun toText(): String {
-        var indent = "\t".repeat(depth)
+    fun toText(currentIndent: Int = 0): String {
+        var indent = "\t".repeat(currentIndent)
         val sb = StringBuilder()
         sb.append("$indent$brightred<$red$name$reset")
         for ((key, value) in attributes) {
@@ -183,7 +174,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
                 sb.append("$brightred>$reset\n")
             }
             for (child in children) {
-                sb.append(child.toText())
+                sb.append(child.toText(currentIndent + 1))
             }
             sb.append("$indent$brightred</$red$name$brightred>$reset\n")
         }
@@ -195,16 +186,15 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
      *
      * @return The string representation of the [XMLElement] for file writing.
      */
-    fun textToFile(): String{
+    fun textToFile(currentIndent: Int = 0): String{
 
-            var indent = "\t".repeat(depth)
+            var indent = "\t".repeat(currentIndent)
             val sb = StringBuilder()
             sb.append("$indent<$name")
             for ((key, value) in attributes) {
                 sb.append(" $key=\"$value\"")
             }
             if (children.isEmpty() && text == "") {
-
                     sb.append("/>\n")
 
             } else {
@@ -215,7 +205,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
                     sb.append(">\n")
                 }
                 for (child in children) {
-                    sb.append(child.textToFile())
+                    sb.append(child.textToFile(currentIndent + 1))
                 }
                 sb.append("$indent</$name>\n")
             }
@@ -316,7 +306,7 @@ class XMLDocument {
      * @param newname The new name you want to be changed to.
      */
     fun renameXMLElements(oldname: String, newname: String) {
-        accept { if (it.name == oldname) it.name = newname; true }
+        accept { if (it.name == oldname && it.name.matches(Regex("[a-z]+"))) it.name = newname; true }
     }
 
     /**

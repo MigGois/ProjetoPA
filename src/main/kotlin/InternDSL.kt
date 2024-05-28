@@ -12,7 +12,6 @@ fun XMLElement.directory(name: String, build: XMLElement.() -> Unit) =
 
 operator fun XMLElement.div(name: String): XMLElement = getChildren().find { it.name == name } as XMLElement
 
-
 fun main() {
 
     val dir = directory("artists") {
@@ -22,7 +21,7 @@ fun main() {
         }
     }
 
-    val help : XMLElement = dir
+    val help : XMLElement = dir / "beatles"
 
     println(help.toText())
 }
