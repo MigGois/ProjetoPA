@@ -86,6 +86,7 @@ val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.is
 
     obj::class.classFields.forEach{ prop ->
         if(prop.hasAnnotation<ExcludeXML>()){
+            //do nothing
         }
         else if(prop.hasAnnotation<AttributeXML>()) {
             val propName = prop.findAnnotation<AttributeXML>()?.name ?: prop.name
