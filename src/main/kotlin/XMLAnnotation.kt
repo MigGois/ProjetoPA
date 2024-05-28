@@ -66,24 +66,15 @@ class AddPercentage: ChangeAttribute {
     }
 }
 
-interface ChangeXML {
+interface ChangeXML{
     fun changeElement(element: XMLElement): XMLElement
-    fun changeAttributePosition(element: XMLElement): XMLElement
 }
 
-class FUCAdapter : ChangeXML {
-    override fun changeElement(element: XMLElement ): XMLElement {
-        return element
-    }
-
-    override fun changeAttributePosition(element: XMLElement): XMLElement {
-
-
-
+class FUCAdapter: ChangeXML {
+    override fun changeElement(element: XMLElement): XMLElement {
         return element
     }
 }
-
 
 fun translate(obj: Any): XMLElement {
 
@@ -93,43 +84,41 @@ val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.is
     XMLElement(obj::class.findAnnotation<ElementXML>()?.name ?: obj::class.simpleName!!, obj::class.findAnnotation<ElementXML>()?.text ?: "")
 }
 
-obj::class.classFields.forEach{ prop ->
-    if(prop.hasAnnotation<ExcludeXML>()){
-        //Do nothing
-    }
-    else if(prop.hasAnnotation<AttributeXML>()) {
-        val propName = prop.findAnnotation<AttributeXML>()?.name ?: prop.name
-        val propValue = prop.getter.call(obj)?.toString() ?: "null"
-        if(prop.hasAnnotation<XmlString>()) {
-            val changeAttributeClass = prop.findAnnotation<XmlString>()?.attribute
-            val changeAttributeInstance = changeAttributeClass?.createInstance()
-            val modifiedValue = changeAttributeInstance?.changeValue(propValue) ?: propValue
-            xmlElement.addAttribute(propName, modifiedValue)
-        }else {
-            xmlElement.addAttribute(propName, propValue)
+    obj::class.classFields.forEach{ prop ->
+        if(prop.hasAnnotation<ExcludeXML>()){
         }
-    }else if(prop.hasAnnotation<ElementXML>()){
-        if(prop.getter.call(obj) is List<*>){
-            if(prop.hasAnnotation<XmlDelist>()){
-                (prop.getter.call(obj) as List<*>).forEach { element ->
-                    if (element != null) {
-                        xmlElement.addElement(translate(element))
+        else if(prop.hasAnnotation<AttributeXML>()) {
+            val propName = prop.findAnnotation<AttributeXML>()?.name ?: prop.name
+            val propValue = prop.getter.call(obj)?.toString() ?: "null"
+            if(prop.hasAnnotation<XmlString>()) {
+                val changeAttributeClass = prop.findAnnotation<XmlString>()?.attribute
+                val changeAttributeInstance = changeAttributeClass?.createInstance()
+                val modifiedValue = changeAttributeInstance?.changeValue(propValue) ?: propValue
+                xmlElement.addAttribute(propName, modifiedValue)
+            }else {
+                xmlElement.addAttribute(propName, propValue)
+            }
+        }else if(prop.hasAnnotation<ElementXML>()){
+            if(prop.getter.call(obj) is List<*>){
+                if(prop.hasAnnotation<XmlDelist>()){
+                    (prop.getter.call(obj) as List<*>).forEach { element ->
+                        if (element != null) {
+                            xmlElement.addElement(translate(element))
+                        }
+                    }
+                } else {
+                    val element1 = XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name,"", xmlElement)
+                    (prop.getter.call(obj) as List<*>).forEach { element ->
+                        if (element != null) {
+                            element1.addElement(translate(element))
+                        }
                     }
                 }
             } else {
-                val element1 = XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name,"", xmlElement)
-                (prop.getter.call(obj) as List<*>).forEach { element ->
-                    if (element != null) {
-                        element1.addElement(translate(element))
-                    }
-                }
+                XMLElement(prop.findAnnotation<ElementXML>()?.name ?: prop.name, prop.getter.call(obj).toString(), xmlElement)
             }
-        } else {
-            println("hi")
-            XMLElement(obj::class.findAnnotation<ElementXML>()?.text ?: "", "")
         }
     }
-}
 
     if (xmlElement::class.hasAnnotation<XMLadapter>()) {
         val changeAttributeClass = xmlElement::class.findAnnotation<XMLadapter>()!!.adapter
