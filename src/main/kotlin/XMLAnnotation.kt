@@ -66,15 +66,24 @@ class AddPercentage: ChangeAttribute {
     }
 }
 
-interface ChangeXML{
+interface ChangeXML {
     fun changeElement(element: XMLElement): XMLElement
+    fun changeAttributePosition(element: XMLElement): XMLElement
 }
 
-class FUCAdapter: ChangeXML {
-    override fun changeElement(element: XMLElement): XMLElement {
+class FUCAdapter : ChangeXML {
+    override fun changeElement(element: XMLElement ): XMLElement {
+        return element
+    }
+
+    override fun changeAttributePosition(element: XMLElement): XMLElement {
+
+
+
         return element
     }
 }
+
 
 fun translate(obj: Any): XMLElement {
 
@@ -86,6 +95,7 @@ val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.is
 
 obj::class.classFields.forEach{ prop ->
     if(prop.hasAnnotation<ExcludeXML>()){
+        //Do nothing
     }
     else if(prop.hasAnnotation<AttributeXML>()) {
         val propName = prop.findAnnotation<AttributeXML>()?.name ?: prop.name
@@ -114,6 +124,9 @@ obj::class.classFields.forEach{ prop ->
                     }
                 }
             }
+        } else {
+            println("hi")
+            XMLElement(obj::class.findAnnotation<ElementXML>()?.text ?: "", "")
         }
     }
 }

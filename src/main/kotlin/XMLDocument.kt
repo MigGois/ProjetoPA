@@ -18,8 +18,8 @@ internal const val reset = "\u001b[0m"
 */
 
 class XMLElement(var name: String, var text: String = "", var parent: XMLElement? = null) {
-    private val children = mutableListOf<XMLElement>()
-    private val attributes = mutableMapOf<String, String>()
+    private val children: MutableList<XMLElement> = mutableListOf()
+    private val attributes: MutableMap<String, String> = mutableMapOf()
 
     init {
         if(text != "") {
@@ -302,7 +302,7 @@ class XMLDocument {
      * Adds an attribute to the [XMLElement].
      *
      * @param name is the name to add in the [XMLElement.attributes] in the [XMLElement].
-     * @param attributevalue The name of the attribute in the [XMLElement.attributes] of the [XMLElement].
+     * @param attributevalue is the name of the attribute in the [XMLElement.attributes] of the [XMLElement].
      */
     fun addAttribute(name: String, attributename: String, attributevalue: String) {
         accept { if (it.name == name) it.addAttribute(attributename, attributevalue); true }

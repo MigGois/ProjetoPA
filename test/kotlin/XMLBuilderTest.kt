@@ -20,11 +20,11 @@ class XMLLibraryTest {
     fun removeXMLElementTest() {
         val document = XMLDocument()
         val element = XMLElement("plano")
-        val element1 = XMLElement("planonovo", parent = element)
+        val element1 = XMLElement("plano2", "text")
         document.addRoot(element)
         element.addElement(element1)
-        element.removeElement("plano1")
-        assertFalse(element.getChildren().contains("plano1"))
+        element.removeElement("plano")
+        assertFalse(element.getChildren().any { it.getElementName() == "plano" })
     }
 
     @Test
@@ -34,20 +34,32 @@ class XMLLibraryTest {
         assertEquals("value1", element.getAttributes()["attribute1"])
     }
 
+    // + removing a non-existent attribute
     @Test
     fun removeAttributeTest() {
         val element = XMLElement("element")
         element.addAttribute("attribute1", "value1")
         element.removeAttribute("attribute1")
         assertEquals(null, element.getAttributes()["attribute1"])
+
+        val exception = assertThrows(IllegalArgumentException::class.java) {
+            element.removeAttribute("attribute2")
+        }
+        assertEquals("Atributo 'attribute2' não existe.", exception.message)
     }
 
+    // + updating a non-existent attribute
     @Test
     fun updateAttributeTest() {
         val element = XMLElement("element")
         element.addAttribute("attribute1", "value1")
         element.updateAttribute("attribute1", "newValue")
         assertEquals("newValue", element.getAttributes()["attribute1"])
+
+        val exception = assertThrows(IllegalArgumentException::class.java) {
+            element.updateAttribute("attribute2", "newValue")
+        }
+        assertEquals("Atributo 'attribute2' não existe.", exception.message)
     }
 
     @Test
@@ -65,7 +77,7 @@ class XMLLibraryTest {
         val child2 = XMLElement("childdois")
         parent.addElement(child1)
         parent.addElement(child2)
-        assertEquals(listOf("childum","childdois"), parent.getChildren())
+        assertEquals(listOf("childum", "childdois"), parent.getChildren().map { it.getElementName() })
     }
 
     @Test
@@ -110,7 +122,7 @@ class XMLLibraryTest {
         assertEquals(expectedFileContent, fileContent)
         file.delete()
     }
-
+    // + adding attribute to nested element
     @Test
     fun addAttributesGloballyTest() {
         val document = XMLDocument()
@@ -118,15 +130,23 @@ class XMLLibraryTest {
         document.addRoot(root)
         document.addAttribute("plano", "peso", "10%")
         assertEquals("10%", root.getAttributes().getValue("peso"))
+
+        val child = XMLElement("child", parent = root)
+        document.addAttribute("child", "nota", "15")
+        assertEquals("15", child.getAttributes().getValue("nota"))
     }
 
+    // + to check if all elements could be renamed.
     @Test
     fun renameEntitiesGloballyTest() {
         val document = XMLDocument()
         val root = XMLElement("plano")
+        val child = XMLElement("child", parent = root)
         document.addRoot(root)
-        document.renameXMLElements("plano", "teste")
-        assertEquals("teste", root.getElementName())
+        document.renameXMLElements("plano", "test")
+        document.renameXMLElements("child", "fuc")
+        assertEquals("fuc", child.getElementName())
+        assertEquals("test/fuc", child.path)
     }
 
     @Test
@@ -135,10 +155,12 @@ class XMLLibraryTest {
         val root = XMLElement("plano")
         document.addRoot(root)
         document.addAttribute("plano", "peso", "10%")
-        document.renameAttributes("plano" ,"peso", "test")
+        document.renameAttributes("plano", "peso", "test")
         assertTrue(root.getAttributes().containsKey("test"))
+        assertFalse(root.getAttributes().containsKey("peso"))
     }
 
+    // + ensure children are also removed
     @Test
     fun removeEntitiesGloballyTest() {
         val document = XMLDocument()
@@ -151,8 +173,8 @@ class XMLLibraryTest {
         parent.addElement(child)
         plano.addElement(parent1)
         document.removeElement("parent")
-        assertFalse(plano.getChildren().contains("parent"))
-        assertFalse(plano.getChildren().contains("child"))
+        assertFalse(plano.getChildren().any { it.getElementName() == "parent" })
+        assertTrue(parent.getChildren().isEmpty())
     }
 
     @Test
@@ -207,4 +229,3 @@ class XMLLibraryTest {
     }
 
 }
-
