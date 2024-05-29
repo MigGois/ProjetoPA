@@ -278,14 +278,14 @@ class XMLDocument {
             sb.append(element?.textToFile())
 
                 if(file.isFile){
-                    println("O ficheiro com '$name' já existe")
+                    throw IllegalArgumentException("O ficheiro com '$name' já existe")
                 }else{
-                    println("O ficheiro '$name' foi criado")
+                    throw IllegalArgumentException("O ficheiro '$name' foi criado")
                 }
 
                 file.writeText(sb.toString())
         }catch(e: Exception) {
-            println("Ocorreu um problema na criação do ficheiro")
+            throw IllegalArgumentException("Ocorreu um problema na criação do ficheiro")
         }
     }
 
@@ -345,7 +345,7 @@ class XMLDocument {
 /**
  * Creates an example XML document.
  */
-fun createExampleXML(){
+/*fun createExampleXML(){
     val document = XMLDocument()
 
     val plano = XMLElement("plano")
@@ -397,4 +397,4 @@ fun createExampleXML(){
 fun main() {
     val exampleXML = createExampleXML()
     println(exampleXML)
-}
+}*/
