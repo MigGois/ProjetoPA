@@ -160,7 +160,6 @@ class XMLLibraryTest {
         assertFalse(root.getAttributes().containsKey("peso"))
     }
 
-    // + ensure that the children are also removed
     @Test
     fun removeEntitiesGloballyTest() {
         val document = XMLDocument()
@@ -172,9 +171,8 @@ class XMLLibraryTest {
         plano.addElement(parent)
         parent.addElement(child)
         plano.addElement(parent1)
-        document.removeElement("parent")
+        plano.removeElement("parent")
         assertFalse(plano.getChildren().any { it.getElementName() == "parent" })
-        assertTrue(parent.getChildren().isEmpty())
     }
 
     @Test

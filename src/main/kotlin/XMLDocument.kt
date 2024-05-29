@@ -86,7 +86,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
      *
      * @return the [XMLElement.attributes]
      */
-    fun getAttributes(): Map<String, String> {
+    fun getAttributes(): MutableMap<String, String> {
         return attributes
     }
 

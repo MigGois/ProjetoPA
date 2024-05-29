@@ -2,11 +2,11 @@
 
 ## Introduction
 
-This tutorial will guide you through the usage of a Kotlin library for handling XML elements and documents. The library includes classes and functions to create, manipulate, and serialize XML structures.
+This tutorial will guide you through the usage of a Kotlin library for handling XML elements and documents. The library includes classes and functions to create and manipulate XML structures.
 
 ## Constants
 
-The library utilizes ANSI color codes for printing colored text:
+The library utilizes color codes for printing colored text:
 
 - `red`: Represents red color.
 - `green`: Represents green color.
@@ -14,8 +14,6 @@ The library utilizes ANSI color codes for printing colored text:
 - `reset`: Resets text color to default.
 
 ## XMLElement Class
-
-### Overview
 
 `XMLElement` represents an XML element with a name, optional text content, and an optional parent element.
 
@@ -36,17 +34,14 @@ The library utilizes ANSI color codes for printing colored text:
 - `renameAttribute(key: String, newkey: String)`: Renames an attribute.
 - `removeAttribute(key: String)`: Removes an attribute.
 - `toText()`: Converts the element and its children to a string representation with colors.
-- `textToFile()`: Converts the element and its children to a string representation without colors.
+- `textToFile()`: Converts the element and its children to a string representation without colors and writes in a file.
 - `accept(visitor: (XMLElement) -> Boolean)`: Accepts a visitor function to traverse the element tree.
 
 ### Properties
 
-- `depth`: Calculates the depth of the element in the tree.
 - `path`: Calculates the path of the element in the tree.
 
 ## XMLDocument Class
-
-### Overview
 
 `XMLDocument` represents an XML document containing a root XML element.
 
@@ -56,7 +51,7 @@ The library utilizes ANSI color codes for printing colored text:
 
 ### Methods
 
-- `addRoot(element: XMLElement)`: Adds a root element.
+- `addRoot(element: XMLElement)`: Adds a root element to the document.
 - `removeElement(name: String)`: Removes an element by name.
 - `generateXML()`: Generates XML content as a string.
 - `generateXMLFile(name: String)`: Generates a file with the specified name.
@@ -71,65 +66,67 @@ The library utilizes ANSI color codes for printing colored text:
 
 ## Kotlin XML Annotations
 
-This markdown provides an overview of the Kotlin annotations used for XML handling.
+This class provides annotations used for XML handling.
 
-### ElementXML Annotation
+### Annotations
+
+#### ElementXML Annotation
 
 - **Target**: `AnnotationTarget.CLASS`, `AnnotationTarget.PROPERTY`
 - **Attributes**:
-    - `name`: Specifies the XML element name.
-    - `text`: Specifies the text content of the XML element.
+    - `name`: The XML element name.
+    - `text`: The text content of the XML element.
 
-### AttributeXML Annotation
+#### AttributeXML Annotation
 
 - **Target**: `AnnotationTarget.PROPERTY`
 - **Attributes**:
-    - `name`: Specifies the name of the XML attribute.
+    - `name`: The name of the XML attribute.
 
-### XmlDelist Annotation
+#### XmlDelist Annotation
 
 - **Target**: `AnnotationTarget.CLASS`, `AnnotationTarget.PROPERTY`
 
-### XmlString Annotation
+#### XmlString Annotation
 
 - **Target**: `AnnotationTarget.PROPERTY`
 - **Attributes**:
-    - `attribute`: Specifies the class responsible for changing attribute values.
+    - `attribute`: The class responsible for changing attribute values.
 
-### XMLadapter Annotation
+#### XMLadapter Annotation
 
 - **Target**: `AnnotationTarget.CLASS`
 - **Attributes**:
-    - `adapter`: Specifies the class responsible for adapting XML elements.
+    - `adapter`: The class responsible for adapting XML elements.
 
-### ExcludeXML Annotation
+#### ExcludeXML Annotation
 
 - **Target**: `AnnotationTarget.PROPERTY`
 
-These annotations provide metadata to Kotlin classes and properties for XML serialization and adaptation.
+### Function
 
-### translate Function
+#### translate Function
 
-The `translate` function converts Kotlin objects into XML elements using the specified annotations.
+The `translate` function converts the objects into XML elements using the specified annotations.
 
 - **Parameters**:
-    - `obj`: Any Kotlin object to be translated into an XML element.
+    - `obj`: Any object to be translated into an XML element.
 - **Returns**:
-    - An `XMLElement` representing the translated XML element.
+    - An `XMLElement` that will represent the translated XML element.
 
-The `translate` function iterates through the properties of the input object and applies annotations to generate XML attributes and elements accordingly. If specified, it utilizes custom attribute change and element adaptation classes.
+The `translate` function iterates through the properties of the object and checks for annotations to generate the XML elements and attributes accordingly.
 
 
 
-## Kotlin Directory Structure
+## Domain-Specific language
 
-This markdown provides an overview of the Kotlin functions and their usage to create a directory structure.
+This class provides functions that can be used to create a directory structure.
 
 ### Functions
 
 #### `directory` Function
 
-- **Description**: Creates a new directory element with the specified name and builds its contents using a lambda.
+- **Description**: Creates a new directory element with the specified name and builds its contents.
 - **Parameters**:
     - `name`: The name of the directory.
     - `build`: Lambda function to build the contents of the directory.
@@ -138,17 +135,17 @@ This markdown provides an overview of the Kotlin functions and their usage to cr
 
 #### `directory` Extension Function
 
-- **Description**: Creates a new directory element within the current element and builds its contents using a lambda.
+- **Description**: Creates a new directory element within the current element and builds its contents.
 - **Parameters**:
     - `name`: The name of the directory.
     - `build`: Lambda function to build the contents of the directory.
 - **Returns**:
-    - An `XMLElement` representing the directory.
+    - An `XMLElement` representing the directory inside another directory.
 
 #### `div` Operator Overload
 
-- **Description**: Retrieves a child element (file or directory) with the specified name.
+- **Description**: Retrieves a directory with the specified name.
 - **Parameters**:
-    - `name`: The name of the child element.
+    - `name`: The name of the directory.
 - **Returns**:
-    - An `XMLElement` representing the child element.
+    - An `XMLElement` representing the elements inside the directory.

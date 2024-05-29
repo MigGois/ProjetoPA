@@ -4,78 +4,75 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.*
 
+/**
+ * Annotation used to mark a class or property for XML serialization, specifying [XMLElement] properties.
+ * @param name The name of the [XMLElement].
+ * @param text The text content of the [XMLElement].
+ */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
 annotation class ElementXML(
     val name: String = "",
     val text: String = ""
 )
 
+/**
+ * Annotation used to mark a property for XML serialization as an attribute.
+ * @param name The name of the XML attribute.
+ */
 @Target(AnnotationTarget.PROPERTY)
 annotation class AttributeXML(
     val name: String
 )
 
+/**
+ * Annotation used to mark a class or property for XML serialization as a list of elements.
+ */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
 annotation class XmlDelist()
 
+/**
+ * Annotation used to mark a property for XML serialization as a string and specify a custom attribute transformation.
+ * @param attribute The class implementing ChangeAttribute interface for attribute transformation.
+ */
 @Target(AnnotationTarget.PROPERTY)
 annotation class XmlString(
     val attribute: KClass<out ChangeAttribute>
 )
 
+/**
+ * Annotation used to specify a custom [XMLadapter] for transforming XML elements.
+ * @param adapter The class implementing ChangeXML interface for element transformation.
+ */
 @Target(AnnotationTarget.CLASS)
 annotation class XMLadapter(
     val adapter: KClass<out ChangeXML>
 )
 
+/**
+ * Annotation used to exclude a property from XML serialization.
+ */
 @Target(AnnotationTarget.PROPERTY)
 annotation class ExcludeXML
 
-@ElementXML ("componente")
-class componenteavaliacao(
-    @AttributeXML("nome")
-    val nome: String,
-    @AttributeXML("valor")
-    @XmlString(AddPercentage::class)
-    val peso: Int
-)
-
-@ElementXML ("fuc")
-@XMLadapter(FUCAdapter::class)
-class fuc(
-    @AttributeXML("codigo")
-    val codigo: String,
-    @ElementXML("nome")
-    val nome: String,
-    @ElementXML("ects")
-    val ects: Double,
-    @ExcludeXML
-    val observacoes: String,
-    @ElementXML("avaliacao")
-    @XmlDelist
-    val avaliacao: List<componenteavaliacao>
-)
-
+/**
+ * Interface defining a method to change the value of an attribute.
+ */
 interface ChangeAttribute{
     fun changeValue(value: Any): String
 }
 
-class AddPercentage: ChangeAttribute {
-    override fun changeValue(value: Any): String {
-        return "$value%"
-    }
-}
-
+/**
+ * Interface defining a method to change the structure of an [XMLElement].
+ */
 interface ChangeXML{
     fun changeElement(element: XMLElement): XMLElement
 }
 
-class FUCAdapter: ChangeXML {
-    override fun changeElement(element: XMLElement): XMLElement {
-        return element
-    }
-}
-
+/**
+ * Function to translate an object to an [XMLElement].
+ * @param obj The object to be translated.
+ * @return The [XMLElement] representing the object.
+ */
 fun translate(obj: Any): XMLElement {
 
 val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.isNullOrEmpty()) {
@@ -121,32 +118,22 @@ val xmlElement: XMLElement = if(obj::class.findAnnotation<ElementXML>()?.name.is
         }
     }
 
-    if (xmlElement::class.hasAnnotation<XMLadapter>()) {
-        val changeAttributeClass = xmlElement::class.findAnnotation<XMLadapter>()!!.adapter
+    if (obj::class.hasAnnotation<XMLadapter>()) {
+        val changeAttributeClass = obj::class.findAnnotation<XMLadapter>()!!.adapter
         return changeAttributeClass.createInstance().changeElement(xmlElement)
-    }
 
-    return xmlElement
+    } else {
+
+        return xmlElement
+    }
 }
 
-
+/**
+ * Extension property to retrieve all declared fields (properties) of a Kotlin class.
+ */
 val KClass<*>.classFields: List<KProperty<*>>
     get() {
         return primaryConstructor!!.parameters.map { p ->
             declaredMemberProperties.find { it.name == p.name }!!
         }
     }
-
-fun main(){
-    val c = componenteavaliacao("Quizzes", 20)
-    val f = fuc("M4310", "Programação Avançada", 6.0, "la la...",
-        listOf(
-            componenteavaliacao("Quizzes", 20),
-            componenteavaliacao("Projeto", 80)
-        )
-    )
-
-    val fucXml: XMLElement = translate(f)
-    println(fucXml.toText())
-
-}
