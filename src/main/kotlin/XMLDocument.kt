@@ -277,13 +277,8 @@ class XMLDocument {
             sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             sb.append(element?.textToFile())
 
-                if(file.isFile){
-                    throw IllegalArgumentException("O ficheiro com '$name' já existe")
-                }else{
-                    throw IllegalArgumentException("O ficheiro '$name' foi criado")
-                }
+            file.writeText(sb.toString())
 
-                file.writeText(sb.toString())
         }catch(e: Exception) {
             throw IllegalArgumentException("Ocorreu um problema na criação do ficheiro")
         }
