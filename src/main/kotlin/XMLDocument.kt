@@ -58,9 +58,13 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
      * @param element the [XMLElement] to add to the [XMLElement.children] list.
      */
     fun addElement(element: XMLElement){
-        element.parent?.children?.remove(element)
-        children.add(element)
-        element.parent = this
+        if(this.text.isEmpty()){
+            element.parent?.children?.remove(element)
+            children.add(element)
+            element.parent = this
+        }else{
+            throw IllegalArgumentException("The element have text and cannot have childs")
+        }
     }
 
     /**
@@ -137,7 +141,7 @@ class XMLElement(var name: String, var text: String = "", var parent: XMLElement
         if (attributes.containsKey(key)) {
             attributes.remove(key)
         } else {
-            println("Atributo '$key' não existe.")
+            throw IllegalArgumentException("Atributo '$key' não existe.")
         }
     }
 
